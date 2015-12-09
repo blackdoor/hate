@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import lombok.Getter;
 
 import java.io.IOException;
 import java.net.URI;
@@ -22,6 +23,7 @@ import static black.door.util.Misc.require;
 /**
  * Created by nfischer on 12/8/2015.
  */
+@Getter
 public class HalRepresentation {
 	private static final ObjectWriter WRITER;
 	static {
@@ -33,11 +35,11 @@ public class HalRepresentation {
 		WRITER = mapper.writer();
 	}
 
-	final Map<String, HalLink> links;
-	final Map<String, Collection<HalLink>> multiLinks;
-	final Map<String, HalRepresentation> embedded;
-	final Map<String, Collection<HalRepresentation>> multiEmbedded;
-	final Map<String, Object> properties;
+	private final Map<String, HalLink> links;
+	private final Map<String, Collection<HalLink>> multiLinks;
+	private final Map<String, HalRepresentation> embedded;
+	private final Map<String, Collection<HalRepresentation>> multiEmbedded;
+	private final Map<String, Object> properties;
 
 	HalRepresentation(
 			Map<String, HalLink> links,
@@ -118,11 +120,11 @@ public class HalRepresentation {
 	}
 
 	public static class HalRepresentationBuilder{
-		Map<String, HalLink> links;
-		Map<String, Collection<HalLink>> multiLinks;
-		Map<String, HalRepresentation> embedded;
-		Map<String, Collection<HalRepresentation>> multiEmbedded;
-		Map<String, Object> properties;
+		private Map<String, HalLink> links;
+		private Map<String, Collection<HalLink>> multiLinks;
+		private Map<String, HalRepresentation> embedded;
+		private Map<String, Collection<HalRepresentation>> multiEmbedded;
+		private Map<String, Object> properties;
 
 		public HalRepresentationBuilder() {
 			links = new HashMap<>();

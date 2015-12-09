@@ -14,13 +14,13 @@ import java.net.URL;
 @Getter
 public class HalLink {
 	@NonNull
-	URI href;
+	private URI href;
 
-	Boolean templated;
-	String type;
-	URL deprecation;
-	String name;
-	URI profile;
-	String title;
-	String hreflang;
+	private Boolean templated;
+	private String type;
+	private URL deprecation;
+	private String name;
+	private URI profile;
+	private String title;
+	private String hreflang;
 }

@@ -36,16 +36,16 @@ public class HalRepresentation {
 	}
 
 	private final Map<String, HalLink> links;
-	private final Map<String, Collection<HalLink>> multiLinks;
+	private final Map<String, List<HalLink>> multiLinks;
 	private final Map<String, HalRepresentation> embedded;
-	private final Map<String, Collection<HalRepresentation>> multiEmbedded;
+	private final Map<String, List<HalRepresentation>> multiEmbedded;
 	private final Map<String, Object> properties;
 
 	HalRepresentation(
 			Map<String, HalLink> links,
-	        Map<String, Collection<HalLink>> multiLinks,
+	        Map<String, List<HalLink>> multiLinks,
 	        Map<String, HalRepresentation> embedded,
-	        Map<String, Collection<HalRepresentation>> multiEmbedded,
+	        Map<String, List<HalRepresentation>> multiEmbedded,
 	        Map<String, Object> properties) {
 		require(null != links);
 		require(null != multiLinks);
@@ -62,6 +62,15 @@ public class HalRepresentation {
 
 	public String serialize() throws JsonProcessingException {
 		return WRITER.writeValueAsString(this);
+	}
+
+	public String toString(){
+		try {
+			return serialize();
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	public static HalRepresentationBuilder paginated(
@@ -121,9 +130,9 @@ public class HalRepresentation {
 
 	public static class HalRepresentationBuilder{
 		private Map<String, HalLink> links;
-		private Map<String, Collection<HalLink>> multiLinks;
+		private Map<String, List<HalLink>> multiLinks;
 		private Map<String, HalRepresentation> embedded;
-		private Map<String, Collection<HalRepresentation>> multiEmbedded;
+		private Map<String, List<HalRepresentation>> multiEmbedded;
 		private Map<String, Object> properties;
 
 		public HalRepresentationBuilder() {
@@ -140,7 +149,7 @@ public class HalRepresentation {
 		}
 
 		private <T> void add(String name, HalResource res, Map<String, T> rs,
-		                     Map<String, Collection<T>> multiRs,
+		                     Map<String, List<T>> multiRs,
 		                     Function<HalResource, T> trans){
 			if(multiRs.containsKey(name)){
 				multiRs.get(name).add(trans.apply(res));
@@ -155,10 +164,10 @@ public class HalRepresentation {
 		}
 
 		private <T> void addMulti(String name, Collection<? extends HalResource> res,
-		                          Map<String, Collection<T>> multiRs,
+		                          Map<String, List<T>> multiRs,
 		                          Function<HalResource, T> trans){
 			Collection<T> links = multiRs.get(name);
-			Collection<T> ls = res.stream()
+			List<T> ls = res.stream()
 					.map(trans)
 					.collect(Collectors.toList());
 			if(links == null) {

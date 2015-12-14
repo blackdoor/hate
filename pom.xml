@@ -32,6 +32,14 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20151123</version>
+            <scope>test</scope>
+        </dependency>
+
+
 
     </dependencies>
 

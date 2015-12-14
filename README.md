@@ -42,7 +42,7 @@ public class Order implements HalResource{
 }	
 ```
 
-Now to get the `HalRepresentation` of an `Order` object, simply do `HalRepresentation hal = myOrder.asEmbedded()`. You can serialize `hal` using `hal.serialize()` or with Jackson (eg. `new ObjectMapper.writeValueAsString(hal)`)
+Now to get the `HalRepresentation` of an `Order` object, simply do `HalRepresentation hal = myOrder.asEmbedded()`. You can serialize `hal` using `hal.serialize()` or with Jackson (eg. `new ObjectMapper().writeValueAsString(hal)`)
 
 The result would look like this:
 

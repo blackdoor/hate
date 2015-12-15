@@ -5,6 +5,10 @@ HATEOAS with HAL for Java
 [![Codacy Badge](https://api.codacy.com/project/badge/grade/7c1d6531e44941ed9e48b75435c9f1b8)](https://www.codacy.com/app/nfischer921/hate)
 
 ---
+## Install with Maven
+
+Get it with jitpack [HERE](https://jitpack.io/#blackdoor/hate)! (availability on maven central coming soon)
+
 ## Basic usage
 
 Implement the `HalResource` interface in your model by implementing the `location()` and `asEmbedded()` methods.  

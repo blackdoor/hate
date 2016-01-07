@@ -105,7 +105,7 @@ public class HalRepresentation {
 		public void serialize(HalRepresentation halRepresentation,
 		                      JsonGenerator jsonGenerator,
 		                      SerializerProvider serializerProvider)
-				throws IOException, JsonProcessingException {
+				throws IOException{
 			jsonGenerator.writeStartObject();
 
 			for(Map.Entry<String, Object> e :halRepresentation.properties.entrySet()){
@@ -151,6 +151,8 @@ public class HalRepresentation {
 		private <T> void add(String name, HalResource res, Map<String, T> rs,
 		                     Map<String, List<T>> multiRs,
 		                     Function<HalResource, T> trans){
+			if(res == null)
+				return;
 			if(multiRs.containsKey(name)){
 				multiRs.get(name).add(trans.apply(res));
 			}else if(rs.containsKey(name)){
@@ -166,8 +168,9 @@ public class HalRepresentation {
 		private <T> void addMulti(String name, Collection<? extends HalResource> res,
 		                          Map<String, List<T>> multiRs,
 		                          Function<HalResource, T> trans){
+			Collection<? extends HalResource> resource = res == null ? new LinkedList<>() : res;
 			Collection<T> links = multiRs.get(name);
-			List<T> ls = res.stream()
+			List<T> ls = resource.stream()
 					.map(trans)
 					.collect(Collectors.toList());
 			if(links == null) {

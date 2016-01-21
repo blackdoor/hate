@@ -97,6 +97,25 @@ public class HalRepresentationTest {
     }
 
     @Test
+    public void testIgnoreNullProp(){
+        HalRepresentation rep = HalRepresentation.builder()
+                .ignoreNullProperties(true)
+                .addProperty("thing", "value")
+                .addProperty("nullthing", null)
+                .build();
+        assertFalse(rep.getProperties().containsKey("nullthing"));
+        assertTrue(rep.getProperties().containsKey("thing"));
+
+        HalRepresentation rep2 = HalRepresentation.builder()
+                .addProperty("thing", "value")
+                .addProperty("nullthing", null)
+                .build();
+        assertTrue(rep2.getProperties().containsKey("nullthing"));
+        assertTrue(rep2.getProperties().containsKey("thing"));
+    }
+
+
+    @Test
     public void testSerialize() throws Exception {
         val basket1 = new Basket(98712);
         val basket2 = new Basket(97213);

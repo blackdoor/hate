@@ -131,6 +131,7 @@ public class HalRepresentation implements java.io.Serializable {
 		private Map<String, HalRepresentation> embedded;
 		private Map<String, List<HalRepresentation>> multiEmbedded;
 		private Map<String, Object> properties;
+		private boolean ignoreNullProperties = false;
 
 		public HalRepresentationBuilder() {
 			links = new HashMap<>();
@@ -140,8 +141,21 @@ public class HalRepresentation implements java.io.Serializable {
 			properties = new HashMap<>();
 		}
 
+		/**
+		 * Causes any properties with null values added to this builder after this call to be ignored.
+		 * Properties with null values added before this call will still be included.
+		 * Null properties are included by default.
+		 * @param active
+		 * @return this builder
+		 */
+		public HalRepresentationBuilder ignoreNullProperties(boolean active){
+			this.ignoreNullProperties = active;
+			return this;
+		}
+
 		public HalRepresentationBuilder addProperty(String name, Object prop){
-			properties.put(name, prop);
+			if(!ignoreNullProperties || prop != null)
+				properties.put(name, prop);
 			return this;
 		}
 

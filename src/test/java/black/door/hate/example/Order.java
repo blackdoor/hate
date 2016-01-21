@@ -1,12 +1,13 @@
 package black.door.hate.example;
 
 import black.door.hate.HalRepresentation;
-import black.door.hate.HalResource;
+import lombok.Getter;
 
 /**
  * Created by nfischer on 12/8/2015.
  */
-public class Order extends Thing implements HalResource {
+@Getter
+public class Order extends Thing{
 
 	private double total;
 	private String currency;
@@ -24,6 +25,7 @@ public class Order extends Thing implements HalResource {
 		this.customer = customer;
 	}
 
+
 	@Override
 	public HalRepresentation asEmbedded() {
 		return HalRepresentation.builder()
@@ -36,9 +38,9 @@ public class Order extends Thing implements HalResource {
 				.build();
 	}
 
+
 	@Override
 	protected String resName() {
 		return "orders";
 	}
-
 }

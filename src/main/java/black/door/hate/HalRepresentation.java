@@ -3,11 +3,8 @@ package black.door.hate;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
 
 import java.io.IOException;
@@ -19,19 +16,18 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static black.door.util.Misc.require;
+import static black.door.hate.Constants.*;
 
 /**
  * Created by nfischer on 12/8/2015.
  */
 @Getter
-public class HalRepresentation {
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonSerialize(using = HalRepresentation.HalRepresentationSerializer.class)
+public class HalRepresentation implements java.io.Serializable {
 	private static final ObjectWriter WRITER;
 	static {
 		ObjectMapper mapper = new ObjectMapper();
-		SimpleModule mod = new SimpleModule();
-		mod.addSerializer(HalRepresentation.class, new HalRepresentationSerializer());
-		mapper.registerModule(mod);
-		mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 		WRITER = mapper.writer();
 	}
 
@@ -107,13 +103,13 @@ public class HalRepresentation {
 			links.putAll(halRepresentation.links);
 			links.putAll(halRepresentation.multiLinks);
 			if(!links.isEmpty())
-				jsonGenerator.writeObjectField("_links", links);
+				jsonGenerator.writeObjectField(_links, links);
 
 			Map<String, Object> embedded = new HashMap<>();
 			embedded.putAll(halRepresentation.embedded);
 			embedded.putAll(halRepresentation.multiEmbedded);
 			if(!embedded.isEmpty())
-				jsonGenerator.writeObjectField("_embedded", embedded);
+				jsonGenerator.writeObjectField(_embedded, embedded);
 
 			jsonGenerator.writeEndObject();
 		}
@@ -136,6 +132,12 @@ public class HalRepresentation {
 
 		public HalRepresentationBuilder addProperty(String name, Object prop){
 			properties.put(name, prop);
+			return this;
+		}
+
+		public HalRepresentationBuilder addProperties(JsonNode jax){
+			require(jax.isObject());
+			jax.fields().forEachRemaining(e -> addProperty(e.getKey(), e.getValue()));
 			return this;
 		}
 

@@ -1,4 +1,6 @@
 # hate
+
+[![Join the chat at https://gitter.im/blackdoor/hate](https://badges.gitter.im/blackdoor/hate.svg)](https://gitter.im/blackdoor/hate?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 HATEOAS with HAL for Java
 
 [![Build Status](https://travis-ci.org/blackdoor/hate.svg)](https://travis-ci.org/blackdoor/hate)  

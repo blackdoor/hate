@@ -11,15 +11,14 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static black.door.hate.Constants._embedded;
 import static black.door.hate.Constants._links;
 import static black.door.util.Misc.require;
-
-import static java.util.stream.Collectors.*;
 import static java.util.Map.Entry;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * Created by nfischer on 12/8/2015.
@@ -82,7 +81,7 @@ public class HalRepresentation implements java.io.Serializable {
 				.addEmbedded(name, stream
 					.skip((effectivePageNumber) *pageSize)
 					.limit(pageSize)
-					.collect(Collectors.toList()))
+					.collect(toList()))
 				.addLink("next", new URI(self + "?page=" + (displayPageNumber + 1)))
 				.addLink("self", new URI(self +
 						(displayPageNumber > 1
@@ -108,7 +107,7 @@ public class HalRepresentation implements java.io.Serializable {
 			jsonGenerator.writeStartObject();
 
 			//write all properties to json
-			for(Map.Entry<String, Object> e :halRepresentation.properties.entrySet()){
+			for(Entry<String, Object> e :halRepresentation.properties.entrySet()){
 				jsonGenerator.writeObjectField(e.getKey(), e.getValue());
 			}
 

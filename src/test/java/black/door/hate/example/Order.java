@@ -27,15 +27,14 @@ public class Order extends Thing{
 
 
 	@Override
-	public HalRepresentation asEmbedded() {
+	public HalRepresentation.HalRepresentationBuilder representationBuilder() {
 		return HalRepresentation.builder()
 				.addProperty("total", total)
 				.addProperty("currency", currency)
 				.addProperty("status", status)
 				.addLink("basket", basket)
 				.addLink("customer", customer)
-				.addLink("self", this)
-				.build();
+				.addLink("self", this);
 	}
 
 

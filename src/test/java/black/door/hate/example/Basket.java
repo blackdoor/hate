@@ -18,7 +18,9 @@ public class Basket extends Thing {
 	}
 
 	@Override
-	public HalRepresentation asEmbedded() {
-		throw new NotImplementedException();
+	public HalRepresentation.HalRepresentationBuilder representationBuilder() {
+		return HalRepresentation.builder()
+				.addProperty("id", id)
+				.addLink("self", this);
 	}
 }

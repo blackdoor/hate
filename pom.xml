@@ -6,7 +6,7 @@
 
     <groupId>black.door</groupId>
     <artifactId>hate</artifactId>
-    <version>v1r0t3</version>
+    <version>v1r1t0</version>
 
     <dependencies>
         <dependency>

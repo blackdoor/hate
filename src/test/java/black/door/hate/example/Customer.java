@@ -18,7 +18,7 @@ public class Customer extends Thing {
 	}
 
 	@Override
-	public HalRepresentation asEmbedded() {
+	public HalRepresentation.HalRepresentationBuilder representationBuilder() {
 		throw new NotImplementedException();
 	}
 }

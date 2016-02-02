@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
+import lombok.SneakyThrows;
 
 import java.io.IOException;
 import java.net.URI;
@@ -58,17 +59,14 @@ public class HalRepresentation implements java.io.Serializable {
 		this.properties = properties;
 	}
 
+
 	public String serialize() throws JsonProcessingException {
 		return WRITER.writeValueAsString(this);
 	}
 
+	@SneakyThrows(JsonProcessingException.class)
 	public String toString(){
-		try {
-			return serialize();
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-			return null;
-		}
+		return serialize();
 	}
 
 	public static HalRepresentationBuilder paginated(

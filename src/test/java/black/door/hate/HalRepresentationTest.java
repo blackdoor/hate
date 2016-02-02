@@ -73,7 +73,17 @@ public class HalRepresentationTest {
         assertEquals(20, rep.getMultiEmbedded().get("orders").size());
         assertEquals("/orders/20",
                 rep.getMultiEmbedded().get("orders").get(0).asEmbedded().getLinks().get("self").asLink()
-                        .getHref().toASCIIString());
+                        .getHref());
+    }
+
+    @Test
+    public void testLinkToString() throws JsonProcessingException {
+        Order o = new Order(1, 1, "USD", "status", new Basket(2), new Customer(3));
+
+        HalLink link = o.asLink();
+        System.out.println(link.toString());
+        assertTrue(link.toString().length() > 0);
+        assertTrue(o.asEmbedded().serialize().contains(link.toString()));
     }
 
     @Test

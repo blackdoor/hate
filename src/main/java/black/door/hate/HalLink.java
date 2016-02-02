@@ -14,7 +14,7 @@ import java.net.URL;
 @Builder
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class HalLink {
+public class HalLink implements LinkOrResource{
 	@NonNull
 	private URI href;
 
@@ -25,4 +25,9 @@ public class HalLink {
 	private URI profile;
 	private String title;
 	private String hreflang;
+
+	@Override
+	public HalLink asLink() {
+		return this;
+	}
 }

@@ -11,13 +11,14 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static black.door.hate.Constants._embedded;
 import static black.door.hate.Constants._links;
 import static black.door.util.Misc.require;
+import static java.util.Map.Entry;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * Created by nfischer on 12/8/2015.
@@ -32,18 +33,18 @@ public class HalRepresentation implements java.io.Serializable {
 		WRITER = mapper.writer();
 	}
 
-	private final Map<String, HalLink> links;
-	private final Map<String, List<HalLink>> multiLinks;
-	private final Map<String, HalRepresentation> embedded;
-	private final Map<String, List<HalRepresentation>> multiEmbedded;
+	private final Map<String, LinkOrResource> links;
+	private final Map<String, List<LinkOrResource>> multiLinks;
+	private final Map<String, HalResource> embedded;
+	private final Map<String, List<HalResource>> multiEmbedded;
 	private final Map<String, Object> properties;
 
 	HalRepresentation(
-			Map<String, HalLink> links,
-	        Map<String, List<HalLink>> multiLinks,
-	        Map<String, HalRepresentation> embedded,
-	        Map<String, List<HalRepresentation>> multiEmbedded,
-	        Map<String, Object> properties) {
+			Map<String, LinkOrResource> links,
+			Map<String, List<LinkOrResource>> multiLinks,
+			Map<String, HalResource> embedded,
+			Map<String, List<HalResource>> multiEmbedded,
+			Map<String, Object> properties) {
 		require(null != links);
 		require(null != multiLinks);
 		require(null != embedded);
@@ -80,7 +81,7 @@ public class HalRepresentation implements java.io.Serializable {
 				.addEmbedded(name, stream
 					.skip((effectivePageNumber) *pageSize)
 					.limit(pageSize)
-					.collect(Collectors.toList()))
+					.collect(toList()))
 				.addLink("next", new URI(self + "?page=" + (displayPageNumber + 1)))
 				.addLink("self", new URI(self +
 						(displayPageNumber > 1
@@ -105,19 +106,46 @@ public class HalRepresentation implements java.io.Serializable {
 				throws IOException{
 			jsonGenerator.writeStartObject();
 
-			for(Map.Entry<String, Object> e :halRepresentation.properties.entrySet()){
+			//write all properties to json
+			for(Entry<String, Object> e :halRepresentation.properties.entrySet()){
 				jsonGenerator.writeObjectField(e.getKey(), e.getValue());
 			}
 
+			//map links from LinkOrResources to HalLinks
+			Map<String, HalLink> linkz = halRepresentation.getLinks().entrySet()
+					.stream()
+					.collect(toMap(Entry::getKey, e -> e.getValue().asLink()));
+			Map<String, Collection<HalLink>> multiLinkz = halRepresentation.getMultiLinks().entrySet()
+					.stream()
+					.collect(toMap(Entry::getKey, e -> e.getValue()
+							.stream()
+							.map(LinkOrResource::asLink)
+							.collect(toList())
+					));
+
+			//put all links and collections of links together in one object
 			Map<String, Object> links = new HashMap<>();
-			links.putAll(halRepresentation.links);
-			links.putAll(halRepresentation.multiLinks);
+			links.putAll(linkz);
+			links.putAll(multiLinkz);
 			if(!links.isEmpty())
 				jsonGenerator.writeObjectField(_links, links);
 
+			//map all HalResources to HalRepresentations
+			Map<String, HalRepresentation> embeddz = halRepresentation.getEmbedded().entrySet()
+					.stream()
+					.collect(toMap(Entry::getKey, e -> e.getValue().asEmbedded()));
+			Map<String, Collection<HalRepresentation>> multiEmbeddz = halRepresentation.getMultiEmbedded().entrySet()
+					.stream()
+					.collect(toMap(Entry::getKey, e -> e.getValue()
+									.stream()
+									.map(HalResource::asEmbedded)
+									.collect(toList())
+					));
+
+			//put all embedded resources and collections of embedded resources into one object
 			Map<String, Object> embedded = new HashMap<>();
-			embedded.putAll(halRepresentation.embedded);
-			embedded.putAll(halRepresentation.multiEmbedded);
+			embedded.putAll(embeddz);
+			embedded.putAll(multiEmbeddz);
 			if(!embedded.isEmpty())
 				jsonGenerator.writeObjectField(_embedded, embedded);
 
@@ -126,10 +154,10 @@ public class HalRepresentation implements java.io.Serializable {
 	}
 
 	public static class HalRepresentationBuilder{
-		private Map<String, HalLink> links;
-		private Map<String, List<HalLink>> multiLinks;
-		private Map<String, HalRepresentation> embedded;
-		private Map<String, List<HalRepresentation>> multiEmbedded;
+		private Map<String, LinkOrResource> links;
+		private Map<String, List<LinkOrResource>> multiLinks;
+		private Map<String, HalResource> embedded;
+		private Map<String, List<HalResource>> multiEmbedded;
 		private Map<String, Object> properties;
 		private boolean ignoreNullProperties = false;
 
@@ -139,6 +167,26 @@ public class HalRepresentation implements java.io.Serializable {
 			embedded = new HashMap<>();
 			multiEmbedded = new HashMap<>();
 			properties = new HashMap<>();
+		}
+
+		public void expand(String fieldName){
+			if(links.containsKey(fieldName)){
+				addEmbedded(fieldName, links.remove(fieldName).asResource().orElseThrow(
+						() -> new CannotEmbedLinkException(fieldName)
+				));
+			} else if(multiLinks.containsKey(fieldName)){
+				try {
+					addEmbedded(fieldName, multiLinks.remove(fieldName)
+							.stream()
+							.map(e -> e.asResource().get())
+							.collect(toList())
+					);
+				}catch (NoSuchElementException e){
+					throw new CannotEmbedLinkException(fieldName);
+				}
+			} else if (!(embedded.containsKey(fieldName) || multiEmbedded.containsKey(fieldName))) {
+				throw new NoSuchElementException("There is no linked or embedded resource with the field name " +fieldName);
+			}
 		}
 
 		/**
@@ -165,64 +213,54 @@ public class HalRepresentation implements java.io.Serializable {
 			return this;
 		}
 
-		private <T> void add(String name, HalResource res, Map<String, T> rs,
-		                     Map<String, List<T>> multiRs,
-		                     Function<HalResource, T> trans){
+		/**
+		 *
+		 * @param <T> either a HalResource or a HalLink
+		 * @param name the field name
+		 * @param res the resource to add to the representation
+		 * @param rs
+		 * @param multiRs
+		 */
+		private <T extends LinkOrResource> void add(String name, T res, Map<String, T> rs,
+		                                            Map<String, List<T>> multiRs){
 			if(res == null)
 				return;
 			if(multiRs.containsKey(name)){
-				multiRs.get(name).add(trans.apply(res));
+				multiRs.get(name).add(res);
 			}else if(rs.containsKey(name)){
 				List<T> ls = new LinkedList<>();
 				ls.add(rs.remove(name));
-				ls.add(trans.apply(res));
+				ls.add(res);
 				multiRs.put(name, ls);
 			}else{
-				rs.put(name, trans.apply(res));
+				rs.put(name, res);
 			}
 		}
 
-		private <T> void addMulti(String name, Collection<? extends HalResource> res,
-		                          Map<String, List<T>> multiRs,
-		                          Function<HalResource, T> trans){
-			Collection<? extends HalResource> resource = res == null ? new LinkedList<>() : res;
+		private <T extends LinkOrResource> void addMulti(String name,
+		                                                 List<T> res,
+		                                                 Map<String, List<T>> multiRs){
+			List<T> resource = res == null ? new LinkedList<>() : res;
 			Collection<T> links = multiRs.get(name);
-			List<T> ls = resource.stream()
-					.map(trans)
-					.collect(Collectors.toList());
 			if(links == null) {
-				multiRs.put(name, ls);
+				multiRs.put(name, resource);
 			}else{
-				links.addAll(ls);
+				links.addAll(resource);
 			}
 		}
 
 		public HalRepresentationBuilder addEmbedded(String name, HalResource link){
-			add(name, link, embedded, multiEmbedded, HalResource::asEmbedded);
+			add(name, link, embedded, multiEmbedded);
 			return this;
 		}
 
-		public HalRepresentationBuilder addEmbedded(String name, Collection<? extends HalResource> link){
-			addMulti(name, link, multiEmbedded, HalResource::asEmbedded);
+		public HalRepresentationBuilder addEmbedded(String name, List<HalResource> link){
+			addMulti(name, link, multiEmbedded);
 			return this;
 		}
 
-		public HalRepresentationBuilder addLink(String name, HalResource link){
-			add(name, link, links, multiLinks, HalResource::asLink);
-			return this;
-		}
-
-		public HalRepresentationBuilder addLink(String name, HalLink link){
-				if(multiLinks.containsKey(name)){
-					multiLinks.get(name).add(link);
-				}else if(links.containsKey(name)){
-					List<HalLink> ls = new LinkedList<>();
-					ls.add(links.remove(name));
-					ls.add(link);
-					multiLinks.put(name, ls);
-				}else{
-					links.put(name, link);
-				}
+		public HalRepresentationBuilder addLink(String name, LinkOrResource link){
+			add(name, link, links, multiLinks);
 			return this;
 		}
 
@@ -231,8 +269,8 @@ public class HalRepresentation implements java.io.Serializable {
 			return addLink(name, l);
 		}
 
-		public HalRepresentationBuilder addLink(String name, Collection<? extends HalResource> link){
-			addMulti(name, link, multiLinks, HalResource::asLink);
+		public HalRepresentationBuilder addLink(String name, List<LinkOrResource> link){
+			addMulti(name, link, multiLinks);
 			return this;
 		}
 

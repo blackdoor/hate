@@ -12,14 +12,13 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.net.URISyntaxException;
+import java.util.*;
 import java.util.stream.IntStream;
 
 import static black.door.util.Misc.list;
 import static java.util.Arrays.asList;
+import static java.util.Arrays.fill;
 import static org.junit.Assert.*;
 
 /**
@@ -73,8 +72,34 @@ public class HalRepresentationTest {
 
         assertEquals(20, rep.getMultiEmbedded().get("orders").size());
         assertEquals("/orders/20",
-                rep.getMultiEmbedded().get("orders").get(0).getLinks().get("self")
+                rep.getMultiEmbedded().get("orders").get(0).asEmbedded().getLinks().get("self").asLink()
                         .getHref().toASCIIString());
+    }
+
+    @Test
+    public void testExpand() throws JsonProcessingException, URISyntaxException {
+        Order o = new Order(1, 1, "USD", "status", new Basket(2), new Customer(3));
+
+        val builder = o.representationBuilder();
+        assertTrue(builder.build().getLinks().containsKey("basket"));
+        builder.expand("basket");
+        assertFalse(builder.build().getLinks().containsKey("basket"));
+        assertTrue(o.asEmbedded("basket").getEmbedded().containsKey("basket"));
+        System.out.println(o.asEmbedded("basket").serialize());
+        
+        builder.expand("basket");
+
+        try{
+            builder.expand("shoe");
+            fail();
+        }catch (NoSuchElementException e){}
+
+        builder.addLink("cars", new URI("/cars"));
+
+        try{
+            builder.expand("cars");
+            fail();
+        }catch (CannotEmbedLinkException e){}
     }
 
     @Test

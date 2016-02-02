@@ -4,7 +4,7 @@ HATEOAS with HAL for Java
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/blackdoor/hate)  
 [![Build Status](https://travis-ci.org/blackdoor/hate.svg)](https://travis-ci.org/blackdoor/hate)  
 [![Codacy Badge](https://api.codacy.com/project/badge/grade/7c1d6531e44941ed9e48b75435c9f1b8)](https://www.codacy.com/app/nfischer921/hate)  
-[![Jitpack Badge](https://img.shields.io/badge/jitpack-available-blue.svg)](https://jitpack.io/#blackdoor/hate)  
+[![JitPack Badge](https://jitpack.io/v/blackdoor/hate.svg)](https://jitpack.io/#blackdoor/hate)
   
 ---
 ## Install with Maven
@@ -35,15 +35,14 @@ public class Order implements HalResource{
 	}
 	
 	@Override
-	public HalRepresentation asEmbedded() {
+	public HalRepresentationBuilder representationBuilder() {
 		return HalRepresentation.builder()
 				.addProperty("total", total)
 				.addProperty("currency", currency)
 				.addProperty("status", status)
 				.addLink("basket", basket)
 				.addLink("customer", customer)
-				.addLink("self", this)
-				.build();
+				.addLink("self", this);
 	}
 }	
 ```

@@ -5,6 +5,11 @@ addons:
   apt:
     packages:
       - oracle-java8-installer
+
+after_success:
+  - ./cd/before-deploy.sh
+  - ./cd/deploy.sh
+
 cache:
   directories:
   - $HOME/.m2

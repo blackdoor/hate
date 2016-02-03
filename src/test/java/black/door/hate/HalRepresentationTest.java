@@ -207,6 +207,31 @@ public class HalRepresentationTest {
     }
 
     @Test
+    public void testAddMulti(){
+        List<Order> orders = new LinkedList<>();
+        Order straggler = new Order(999, 999, "adf", "asdf", new Basket(999), new Customer(999));
+        Order straggler2 = new Order(998, 998, "adf", "asdf", new Basket(998), new Customer(998));
+
+        IntStream.range(0, 100)
+                .forEach(i ->
+                                orders.add(new Order(i, i, "USD", "status",
+                                        new Basket(i), new Customer(i)))
+                );
+
+        val rep = HalRepresentation.builder()
+                .addEmbedded("orders", straggler)
+                .addEmbedded("orders", orders)
+                .addEmbedded("orders", straggler2)
+                .addLink("orders", straggler)
+                .addLink("orders", orders)
+                .addLink("orders", straggler2)
+                .build();
+
+        assertEquals(orders.size() +2, rep.getMultiEmbedded().get("orders").size());
+        assertEquals(orders.size() + 2, rep.getMultiLinks().get("orders").size());
+    }
+
+    @Test
     public void testNoProperties() throws Exception{
         val basket1 = new Basket(98712);
         val cust1 = new Customer(7809);

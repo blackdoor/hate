@@ -235,11 +235,11 @@ public class HalRepresentation implements java.io.Serializable {
 			}
 		}
 
-		private <T extends LinkOrResource> void addMulti(String name,
-		                                                 List<T> res,
-		                                                 Map<String, List<T>> multiRs){
-			List<T> resource = res == null ? new LinkedList<>() : res;
-			Collection<T> links = multiRs.get(name);
+		private <T extends LinkOrResource> void addMulti(String name, List<? extends T> res, Map<String, T> rs, Map<String, List<T>> multiRs){
+			List<T> resource = new LinkedList<>(res);
+			if(rs.containsKey(name))
+				resource.add(rs.get(name));
+			List<T> links = multiRs.get(name);
 			if(links == null) {
 				multiRs.put(name, resource);
 			}else{
@@ -252,8 +252,8 @@ public class HalRepresentation implements java.io.Serializable {
 			return this;
 		}
 
-		public HalRepresentationBuilder addEmbedded(String name, List<HalResource> link){
-			addMulti(name, link, multiEmbedded);
+		public HalRepresentationBuilder addEmbedded(String name, List<? extends HalResource> link){
+			addMulti(name, link, embedded, multiEmbedded);
 			return this;
 		}
 
@@ -267,8 +267,8 @@ public class HalRepresentation implements java.io.Serializable {
 			return addLink(name, l);
 		}
 
-		public HalRepresentationBuilder addLink(String name, List<LinkOrResource> link){
-			addMulti(name, link, multiLinks);
+		public HalRepresentationBuilder addLink(String name, List<? extends LinkOrResource> link){
+			addMulti(name, link, links, multiLinks);
 			return this;
 		}
 

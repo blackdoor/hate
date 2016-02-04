@@ -4,6 +4,7 @@ HATEOAS with HAL for Java. Create hypermedia APIs by easily serializing your Jav
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/blackdoor/hate)  
 [![Build Status](https://travis-ci.org/blackdoor/hate.svg)](https://travis-ci.org/blackdoor/hate)  
 [![Codacy Badge](https://api.codacy.com/project/badge/grade/7c1d6531e44941ed9e48b75435c9f1b8)](https://www.codacy.com/app/nfischer921/hate)  
+[![Codecov](https://img.shields.io/codecov/c/github/blackdoor/hate.svg)](https://codecov.io/github/blackdoor/hate)  
 [![JavaDocs](https://img.shields.io/maven-central/v/black.door/hate.svg?label=javadocs)](https://www.javadoc.io/doc/black.door/hate)  
 [![Maven Central](https://img.shields.io/maven-central/v/black.door/hate.svg)](http://mvnrepository.com/artifact/black.door/hate)
 
@@ -15,7 +16,7 @@ HATEOAS with HAL for Java. Create hypermedia APIs by easily serializing your Jav
   <dependency>
     <groupId>black.door</groupId>
     <artifactId>hate</artifactId>
-    <version>v1r2t2</version>
+    <version>v1r2t3</version>
   </dependency>
 </dependencies>
 ```

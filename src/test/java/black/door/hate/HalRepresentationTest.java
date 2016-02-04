@@ -214,12 +214,12 @@ public class HalRepresentationTest {
                 .addProperty("prop", 5)
                 .build();
 
-        assertFalse(new ObjectMapper().readTree(rep.serialize()).has("_embedded"));
+        assertFalse(new ObjectMapper().readTree(rep.toString()).has("_embedded"));
     }
 
     @Test
     public void testAddMulti(){
-        List<Order> orders = new LinkedList<>();
+        Collection<Order> orders = new LinkedList<>();
         Order straggler = new Order(999, 999, "adf", "asdf", new Basket(999), new Customer(999));
         Order straggler2 = new Order(998, 998, "adf", "asdf", new Basket(998), new Customer(998));
 

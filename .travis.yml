@@ -6,10 +6,15 @@ addons:
     packages:
       - oracle-java8-installer
 
+before_install:
+  - pip install --user codecov
+
 after_success:
+  - codecov
   - ./cd/before-deploy.sh
   - ./cd/deploy.sh
 
 cache:
   directories:
   - $HOME/.m2
+  - $HOME/.cache/pip

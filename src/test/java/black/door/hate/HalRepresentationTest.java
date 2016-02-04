@@ -117,16 +117,27 @@ public class HalRepresentationTest {
         val basket1 = new Basket(98712);
         val cust2 = new Customer(12369);
 
-        val order1 = new Order(123, 30.0, null, "shipped", basket1, null);
-        val order2 = new Order(124, 20, "USD", "processing", null, cust2);
+        val order1 = new Order(123, 30.0, null, "shipped", basket1, cust2);
+        val order2 = new Order(124, 20, "USD", "processing", basket1, cust2);
 
-        val mapper = new ObjectMapper();
+        List<HalResource> n = null;
+        HalResource n2 = null;
 
         val orderz = HalRepresentation.paginated(
                 "orders", "/orders", list(order1, order2).stream(), 0, 2)
                 .addProperty("currentlyProcessing", 14)
                 .addProperty("shippedToday", 20)
+                .addEmbedded("n", n)
                 .build();
+
+        try {
+            HalRepresentation.builder().addEmbedded("n", n2).build().serialize();
+            fail();
+        }catch (IllegalArgumentException e){
+
+        }
+
+        HalRepresentation.builder().ignoreNullResources(true).addEmbedded("n", n2).build().serialize();
 
         System.out.println(orderz.serialize());
     }

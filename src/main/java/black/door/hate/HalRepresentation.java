@@ -158,6 +158,7 @@ public class HalRepresentation implements java.io.Serializable {
 		private Map<String, List<HalResource>> multiEmbedded;
 		private Map<String, Object> properties;
 		private boolean ignoreNullProperties = false;
+		private boolean ignoreNullResources = false;
 
 		public HalRepresentationBuilder() {
 			links = new HashMap<>();
@@ -199,6 +200,19 @@ public class HalRepresentation implements java.io.Serializable {
 			return this;
 		}
 
+		public boolean ignoreNullProperties(){
+			return ignoreNullProperties;
+		}
+
+		public boolean isIgnoreNullResources(){
+			return ignoreNullResources;
+		}
+
+		public HalRepresentationBuilder ignoreNullResources(boolean active){
+			this.ignoreNullResources = active;
+			return this;
+		}
+
 		public HalRepresentationBuilder addProperty(String name, Object prop){
 			if(!ignoreNullProperties || prop != null)
 				properties.put(name, prop);
@@ -221,8 +235,11 @@ public class HalRepresentation implements java.io.Serializable {
 		 */
 		private <T extends LinkOrResource> void add(String name, T res, Map<String, T> rs,
 		                                            Map<String, List<T>> multiRs){
-			if(res == null)
+
+			if(res == null && ignoreNullResources)
 				return;
+
+			require(res != null , "Cannot add a null linked or embedded resource");
 			if(multiRs.containsKey(name)){
 				multiRs.get(name).add(res);
 			}else if(rs.containsKey(name)){
@@ -236,7 +253,7 @@ public class HalRepresentation implements java.io.Serializable {
 		}
 
 		private <T extends LinkOrResource> void addMulti(String name, List<? extends T> res, Map<String, T> rs, Map<String, List<T>> multiRs){
-			List<T> resource = new LinkedList<>(res);
+			List<T> resource = res == null ? new LinkedList<>() : new LinkedList<>(res);
 			if(rs.containsKey(name))
 				resource.add(rs.get(name));
 			List<T> links = multiRs.get(name);

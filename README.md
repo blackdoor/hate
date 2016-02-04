@@ -15,14 +15,14 @@ HATEOAS with HAL for Java. Create hypermedia APIs by easily serializing your Jav
   <dependency>
     <groupId>black.door</groupId>
     <artifactId>hate</artifactId>
-    <version>v1r2t1</version>
+    <version>v1r2t2</version>
   </dependency>
 </dependencies>
 ```
 
 ## Basic usage
 
-Implement the `HalResource` interface in your model by implementing the `location()` and `asEmbedded()` methods.  
+Implement the `HalResource` interface in your model by implementing the `location()` and `representationBuilder()` methods.
 For example:
 
 ```java

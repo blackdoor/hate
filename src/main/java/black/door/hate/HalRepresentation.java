@@ -14,6 +14,7 @@ import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static black.door.hate.Constants.SELF;
 import static black.door.hate.Constants._embedded;
 import static black.door.hate.Constants._links;
 import static black.door.util.Misc.require;
@@ -81,7 +82,7 @@ public class HalRepresentation implements java.io.Serializable {
 					.limit(pageSize)
 					.collect(toList()))
 				.addLink("next", new URI(self + "?page=" + (displayPageNumber + 1)))
-				.addLink("self", new URI(self +
+				.addLink(SELF, new URI(self +
 						(displayPageNumber > 1
 							? "?page=" +displayPageNumber
 							: "")
@@ -168,7 +169,7 @@ public class HalRepresentation implements java.io.Serializable {
 			properties = new HashMap<>();
 		}
 
-		public void expand(String fieldName){
+		public HalRepresentationBuilder expand(String fieldName){
 			if(links.containsKey(fieldName)){
 				addEmbedded(fieldName, links.remove(fieldName).asResource().orElseThrow(
 						() -> new CannotEmbedLinkException(fieldName)
@@ -186,6 +187,7 @@ public class HalRepresentation implements java.io.Serializable {
 			} else if (!(embedded.containsKey(fieldName) || multiEmbedded.containsKey(fieldName))) {
 				throw new NoSuchElementException("There is no linked or embedded resource with the field name " +fieldName);
 			}
+			return this;
 		}
 
 		/**

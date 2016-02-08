@@ -6,5 +6,6 @@ package black.door.hate;
 public interface Constants {
 	String _links = "_links";
 	String _embedded = "_embedded";
+	String SELF = "self";
 	String HAL_JSON_CONTENT_TYPE = "application/hal+json";
 }

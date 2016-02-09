@@ -13,6 +13,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Created by nfischer on 12/8/2015.
@@ -42,20 +43,27 @@ public class HalLink implements LinkOrResource{
 		this.hreflang = hreflang;
 	}
 
-
 	public static HalLinkBuilder builder() {
 		return new HalLinkBuilder();
 	}
 
 	@JsonIgnore
 	@SneakyThrows(URISyntaxException.class)
-	public URI getHrefAsUri(){
-		return new URI(href);
+	public Optional<URI> getHrefAsUri(){
+		if(!isTemplated())
+			return Optional.of(new URI(href));
+		return Optional.empty();
 	}
 
 	@JsonIgnore
-	public UriTemplate getHrefAsTemplate(){
-		return UriTemplate.fromTemplate(href);
+	public Optional<UriTemplate> getHrefAsTemplate(){
+		if(isTemplated())
+			return Optional.of(UriTemplate.fromTemplate(href));
+		return Optional.empty();
+	}
+
+	public boolean isTemplated(){
+		return templated;
 	}
 
 	@Override

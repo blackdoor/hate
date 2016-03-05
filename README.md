@@ -5,8 +5,8 @@ HATEOAS with HAL for Java. Create hypermedia APIs by easily serializing your Jav
 [![Build Status](https://travis-ci.org/blackdoor/hate.svg)](https://travis-ci.org/blackdoor/hate)  
 [![Codacy Badge](https://api.codacy.com/project/badge/grade/7c1d6531e44941ed9e48b75435c9f1b8)](https://www.codacy.com/app/nfischer921/hate)  
 [![Codecov](https://img.shields.io/codecov/c/github/blackdoor/hate.svg)](https://codecov.io/github/blackdoor/hate)  
-[![JavaDocs](https://img.shields.io/maven-central/v/black.door/hate.svg?label=javadocs)](https://www.javadoc.io/doc/black.door/hate)  
-[![Maven Central](https://img.shields.io/maven-central/v/black.door/hate.svg)](http://mvnrepository.com/artifact/black.door/hate)
+[![JavaDocs](http://javadoc-emblem.rhcloud.com/doc/black.door/hate/badge.svg?color=blue)](https://www.javadoc.io/doc/black.door/hate)  
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/black.door/hate/badge.svg)](http://mvnrepository.com/artifact/black.door/hate)
 
 ---
 ## Install with Maven
@@ -16,7 +16,7 @@ HATEOAS with HAL for Java. Create hypermedia APIs by easily serializing your Jav
   <dependency>
     <groupId>black.door</groupId>
     <artifactId>hate</artifactId>
-    <version>v1r2t3</version>
+    <version>v1r3t0</version>
   </dependency>
 </dependencies>
 ```

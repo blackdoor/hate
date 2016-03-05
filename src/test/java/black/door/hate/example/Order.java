@@ -1,6 +1,7 @@
 package black.door.hate.example;
 
 import black.door.hate.HalRepresentation;
+import black.door.hate.HalResource;
 import lombok.Getter;
 
 /**
@@ -28,13 +29,12 @@ public class Order extends Thing{
 
 	@Override
 	public HalRepresentation.HalRepresentationBuilder representationBuilder() {
-		return HalRepresentation.builder()
-				.addProperty("total", total)
-				.addProperty("currency", currency)
-				.addProperty("status", status)
+		return Order.super.representationBuilder()
+				.removeProperty("basket")
+				.removeProperty("id")
+				.removeProperty("customer")
 				.addLink("basket", basket)
-				.addLink("customer", customer)
-				.addLink("self", this);
+				.addLink("customer", customer);
 	}
 
 

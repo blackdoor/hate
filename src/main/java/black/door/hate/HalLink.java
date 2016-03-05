@@ -4,10 +4,7 @@ import com.damnhandy.uri.template.UriTemplate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.SneakyThrows;
+import lombok.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -19,6 +16,7 @@ import java.util.Optional;
  * Created by nfischer on 12/8/2015.
  */
 @Getter
+@EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class HalLink implements LinkOrResource{
 
@@ -74,9 +72,11 @@ public class HalLink implements LinkOrResource{
 	@Override
 	@SneakyThrows(JsonProcessingException.class)
 	public String toString(){
-		return new ObjectMapper().writeValueAsString(this);
+		return HalRepresentation.getWriter().writeValueAsString(this);
 	}
 
+	@ToString
+	@EqualsAndHashCode
 	public static class HalLinkBuilder {
 		private String href;
 		private Boolean templated;
@@ -137,8 +137,5 @@ public class HalLink implements LinkOrResource{
 			return new HalLink(href, templated, type, deprecation, name, profile, title, hreflang);
 		}
 
-		public String toString() {
-			return "black.door.hate.HalLink.HalLinkBuilder(href=" + this.href + ", templated=" + this.templated + ", type=" + this.type + ", deprecation=" + this.deprecation + ", name=" + this.name + ", profile=" + this.profile + ", title=" + this.title + ", hreflang=" + this.hreflang + ")";
-		}
 	}
 }

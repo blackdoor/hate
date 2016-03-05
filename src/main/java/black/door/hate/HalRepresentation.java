@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
@@ -14,9 +15,7 @@ import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static black.door.hate.Constants.SELF;
-import static black.door.hate.Constants._embedded;
-import static black.door.hate.Constants._links;
+import static black.door.hate.Constants.*;
 import static black.door.util.Misc.require;
 import static java.util.Map.Entry;
 import static java.util.stream.Collectors.toList;
@@ -29,10 +28,12 @@ import static java.util.stream.Collectors.toMap;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonSerialize(using = HalRepresentation.HalRepresentationSerializer.class)
 public class HalRepresentation implements java.io.Serializable {
-	private static final ObjectWriter WRITER;
+	private static ObjectMapper MAPPER;
+	private static ObjectWriter WRITER;
 	static {
-		ObjectMapper mapper = new ObjectMapper();
-		WRITER = mapper.writer();
+		MAPPER = new ObjectMapper()
+				.registerModule(new JavaTimeModule());
+		WRITER = MAPPER.writer();
 	}
 
 	private final Map<String, LinkOrResource> links;
@@ -60,6 +61,20 @@ public class HalRepresentation implements java.io.Serializable {
 		this.properties = properties;
 	}
 
+	static ObjectMapper getMapper(){
+		return MAPPER;
+	}
+
+	static ObjectWriter getWriter(){
+		return WRITER;
+	}
+
+	public static void useMapper(ObjectMapper mapper){
+		if(!Objects.equals(MAPPER, mapper)){
+			MAPPER = mapper;
+			WRITER = mapper.writer();
+		}
+	}
 
 	public String serialize() throws JsonProcessingException {
 		return WRITER.writeValueAsString(this);
@@ -288,6 +303,23 @@ public class HalRepresentation implements java.io.Serializable {
 
 		public HalRepresentationBuilder addLink(String name, Collection<? extends LinkOrResource> link){
 			addMulti(name, link, links, multiLinks);
+			return this;
+		}
+
+		public HalRepresentationBuilder removeLink(String name){
+			links.remove(name);
+			multiLinks.remove(name);
+			return this;
+		}
+
+		public HalRepresentationBuilder removeEmbedded(String name){
+			embedded.remove(name);
+			multiEmbedded.remove(name);
+			return this;
+		}
+
+		public HalRepresentationBuilder removeProperty(String name){
+			properties.remove(name);
 			return this;
 		}
 

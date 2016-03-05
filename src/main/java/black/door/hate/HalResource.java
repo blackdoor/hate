@@ -13,6 +13,10 @@ public interface HalResource extends LocatableResource, LinkOrResource {
 		return builder.build();
 	}
 
-	HalRepresentation.HalRepresentationBuilder representationBuilder();
+	default HalRepresentation.HalRepresentationBuilder representationBuilder(){
+		return HalRepresentation.builder()
+				.addLink("self", this)
+				.addProperties(HalRepresentation.getMapper().valueToTree(this));
+	}
 
 }

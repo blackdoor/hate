@@ -103,6 +103,8 @@ public class HalRepresentationTest {
         Order o = new Order(1, 1, "USD", "status", new Basket(2), new Customer(3));
 
         val builder = o.representationBuilder();
+        builder.addLink("z", new Basket(1))
+                .addLink("z", new Basket(5));
         assertTrue(builder.build().getLinks().containsKey("basket"));
         builder.expand("basket");
         assertFalse(builder.build().getLinks().containsKey("basket"));
@@ -122,6 +124,11 @@ public class HalRepresentationTest {
             builder.expand("cars");
             fail();
         }catch (CannotEmbedLinkException e){}
+
+        builder.expand("z");
+
+        assertFalse(builder.build().getMultiLinks().containsKey("z"));
+        assertTrue(builder.build().getMultiEmbedded().containsKey("z"));
     }
 
     @Test
@@ -232,7 +239,7 @@ public class HalRepresentationTest {
     }
 
     @Test
-    public void testSerializer() throws JsonProcessingException {
+    public void testSerializer() throws IOException {
         ObjectMapper mapper = new ObjectMapper()
                 .registerModule(new JavaTimeModule());
 
@@ -256,6 +263,16 @@ public class HalRepresentationTest {
         assertFalse(node.get("start").isArray());
         assertTrue(node.get("start").isTextual());
         assertEquals(LocalDate.MIN.toString(), node.get("start").asText());
+
+        HalRepresentation.useMapper(mapper);
+        final JsonNode node2 = new ObjectMapper().readTree(box.asEmbedded().serialize());
+
+        assertTrue(node2.get("other").asText().equals(HelloSerializer.HELLO));
+        assertFalse(node2.has("end"));
+        assertFalse(node2.has("stuff"));
+        assertFalse(node2.get("start").isArray());
+        assertTrue(node2.get("start").isTextual());
+        assertEquals(LocalDate.MIN.toString(), node2.get("start").asText());
     }
 
     @Test

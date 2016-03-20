@@ -3,8 +3,12 @@ package black.door.hate;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -111,7 +115,15 @@ public class HalRepresentation implements java.io.Serializable {
 	}
 
 	public static class HalRepresentationSerializer
-			extends JsonSerializer<HalRepresentation>{
+			extends StdSerializer<HalRepresentation> {
+
+		public HalRepresentationSerializer(){
+			this(HalRepresentation.class);
+		}
+
+		protected HalRepresentationSerializer(Class<HalRepresentation> t) {
+			super(t);
+		}
 
 		@Override
 		public void serialize(HalRepresentation halRepresentation,
@@ -122,7 +134,7 @@ public class HalRepresentation implements java.io.Serializable {
 
 			//write all properties to json
 			for(Entry<String, Object> e :halRepresentation.properties.entrySet()){
-				jsonGenerator.writeObjectField(e.getKey(), e.getValue());
+				serializerProvider.defaultSerializeField(e.getKey(), e.getValue(), jsonGenerator);
 			}
 
 			//map links from LinkOrResources to HalLinks
@@ -142,7 +154,7 @@ public class HalRepresentation implements java.io.Serializable {
 			links.putAll(linkz);
 			links.putAll(multiLinkz);
 			if(!links.isEmpty())
-				jsonGenerator.writeObjectField(_links, links);
+				serializerProvider.defaultSerializeField(_links, links, jsonGenerator);
 
 			//map all HalResources to HalRepresentations
 			Map<String, HalRepresentation> embeddz = halRepresentation.getEmbedded().entrySet()
@@ -161,7 +173,7 @@ public class HalRepresentation implements java.io.Serializable {
 			embedded.putAll(embeddz);
 			embedded.putAll(multiEmbeddz);
 			if(!embedded.isEmpty())
-				jsonGenerator.writeObjectField(_embedded, embedded);
+				serializerProvider.defaultSerializeField(_embedded, embedded, jsonGenerator);
 
 			jsonGenerator.writeEndObject();
 		}

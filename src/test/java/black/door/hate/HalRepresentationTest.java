@@ -3,9 +3,19 @@ package black.door.hate;
 import black.door.hate.example.Basket;
 import black.door.hate.example.Customer;
 import black.door.hate.example.Order;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.Version;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.Data;
+import lombok.SneakyThrows;
 import lombok.val;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -13,6 +23,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -91,6 +103,8 @@ public class HalRepresentationTest {
         Order o = new Order(1, 1, "USD", "status", new Basket(2), new Customer(3));
 
         val builder = o.representationBuilder();
+        builder.addLink("z", new Basket(1))
+                .addLink("z", new Basket(5));
         assertTrue(builder.build().getLinks().containsKey("basket"));
         builder.expand("basket");
         assertFalse(builder.build().getLinks().containsKey("basket"));
@@ -110,6 +124,11 @@ public class HalRepresentationTest {
             builder.expand("cars");
             fail();
         }catch (CannotEmbedLinkException e){}
+
+        builder.expand("z");
+
+        assertFalse(builder.build().getMultiLinks().containsKey("z"));
+        assertTrue(builder.build().getMultiEmbedded().containsKey("z"));
     }
 
     @Test
@@ -183,6 +202,77 @@ public class HalRepresentationTest {
         val theirs = (ObjectNode) mapper.readTree(RFC);
 
         assertEquals(theirs, mine);
+    }
+
+    @Data
+    private static class TimeBox implements JacksonHalResource{
+        LocalDate start = LocalDate.MIN;
+
+        LocalDateTime stuff = null;
+
+        @JsonIgnore
+        LocalDate end = LocalDate.now();
+
+        public static class OtherThing{}
+
+        OtherThing other = new OtherThing();
+
+        @Override
+        @SneakyThrows
+        public URI location() {
+            return new URI("/hi");
+        }
+    }
+
+    private static class HelloSerializer extends StdSerializer<TimeBox.OtherThing> {
+
+        public static final String HELLO = "Hello World.";
+
+        protected HelloSerializer(Class<TimeBox.OtherThing> t) {
+            super(t);
+        }
+
+        @Override
+        public void serialize(TimeBox.OtherThing o, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
+            jsonGenerator.writeString(HELLO);
+        }
+    }
+
+    @Test
+    public void testSerializer() throws IOException {
+        ObjectMapper mapper = new ObjectMapper()
+                .registerModule(new JavaTimeModule());
+
+        TimeBox box = new TimeBox();
+
+        val mod = new SimpleModule("mod", new Version(1,1,1,null));
+        mod.addSerializer(new HelloSerializer(TimeBox.OtherThing.class));
+        mapper.registerModule(mod);
+
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+        System.out.println(mapper.writeValueAsString(box));
+        final JsonNode node = mapper.valueToTree(box.asEmbedded(mapper));
+        System.out.println(node);
+        System.out.println(box.asEmbedded(mapper).serialize());
+
+        assertTrue(node.get("other").asText().equals(HelloSerializer.HELLO));
+        assertFalse(node.has("end"));
+        assertFalse(node.has("stuff"));
+        assertFalse(node.get("start").isArray());
+        assertTrue(node.get("start").isTextual());
+        assertEquals(LocalDate.MIN.toString(), node.get("start").asText());
+
+        HalRepresentation.useMapper(mapper);
+        final JsonNode node2 = new ObjectMapper().readTree(box.asEmbedded().serialize());
+
+        assertTrue(node2.get("other").asText().equals(HelloSerializer.HELLO));
+        assertFalse(node2.has("end"));
+        assertFalse(node2.has("stuff"));
+        assertFalse(node2.get("start").isArray());
+        assertTrue(node2.get("start").isTextual());
+        assertEquals(LocalDate.MIN.toString(), node2.get("start").asText());
     }
 
     @Test

@@ -16,7 +16,7 @@ HATEOAS with HAL for Java. Create hypermedia APIs by easily serializing your Jav
   <dependency>
     <groupId>black.door</groupId>
     <artifactId>hate</artifactId>
-    <version>v1r3t0</version>
+    <version>v1r3t1</version>
   </dependency>
 </dependencies>
 ```

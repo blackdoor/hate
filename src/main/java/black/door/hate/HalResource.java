@@ -1,22 +1,20 @@
 package black.door.hate;
 
+import static black.door.hate.HalRepresentation.HalRepresentationBuilder;
+
 /**
  * Created by nfischer on 12/8/2015.
  */
 public interface HalResource extends LocatableResource, LinkOrResource {
 
 	default HalRepresentation asEmbedded(String... expand){
-		HalRepresentation.HalRepresentationBuilder builder = representationBuilder();
+		HalRepresentationBuilder builder = representationBuilder();
 		for(String e : expand){
 			builder.expand(e);	
 		}
 		return builder.build();
 	}
 
-	default HalRepresentation.HalRepresentationBuilder representationBuilder(){
-		return HalRepresentation.builder()
-				.addLink("self", this)
-				.addProperties(HalRepresentation.getMapper().valueToTree(this));
-	}
+	HalRepresentationBuilder representationBuilder();
 
 }

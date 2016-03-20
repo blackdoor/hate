@@ -1,6 +1,7 @@
 package black.door.hate.example;
 
 import black.door.hate.HalResource;
+import black.door.hate.JacksonHalResource;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -13,7 +14,7 @@ import java.net.URISyntaxException;
  */
 @AllArgsConstructor
 @Getter
-public abstract class Thing implements HalResource {
+public abstract class Thing implements JacksonHalResource {
 	protected long id;
 
 	protected abstract String resName();

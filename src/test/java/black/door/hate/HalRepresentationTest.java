@@ -3,9 +3,19 @@ package black.door.hate;
 import black.door.hate.example.Basket;
 import black.door.hate.example.Customer;
 import black.door.hate.example.Order;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.Version;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.Data;
+import lombok.SneakyThrows;
 import lombok.val;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -13,6 +23,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -183,6 +195,67 @@ public class HalRepresentationTest {
         val theirs = (ObjectNode) mapper.readTree(RFC);
 
         assertEquals(theirs, mine);
+    }
+
+    @Data
+    private static class TimeBox implements JacksonHalResource{
+        LocalDate start = LocalDate.MIN;
+
+        LocalDateTime stuff = null;
+
+        @JsonIgnore
+        LocalDate end = LocalDate.now();
+
+        public static class OtherThing{}
+
+        OtherThing other = new OtherThing();
+
+        @Override
+        @SneakyThrows
+        public URI location() {
+            return new URI("/hi");
+        }
+    }
+
+    private static class HelloSerializer extends StdSerializer<TimeBox.OtherThing> {
+
+        public static final String HELLO = "Hello World.";
+
+        protected HelloSerializer(Class<TimeBox.OtherThing> t) {
+            super(t);
+        }
+
+        @Override
+        public void serialize(TimeBox.OtherThing o, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
+            jsonGenerator.writeString(HELLO);
+        }
+    }
+
+    @Test
+    public void testSerializer() throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper()
+                .registerModule(new JavaTimeModule());
+
+        TimeBox box = new TimeBox();
+
+        val mod = new SimpleModule("mod", new Version(1,1,1,null));
+        mod.addSerializer(new HelloSerializer(TimeBox.OtherThing.class));
+        mapper.registerModule(mod);
+
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+        System.out.println(mapper.writeValueAsString(box));
+        final JsonNode node = mapper.valueToTree(box.asEmbedded(mapper));
+        System.out.println(node);
+        System.out.println(box.asEmbedded(mapper).serialize());
+
+        assertTrue(node.get("other").asText().equals(HelloSerializer.HELLO));
+        assertFalse(node.has("end"));
+        assertFalse(node.has("stuff"));
+        assertFalse(node.get("start").isArray());
+        assertTrue(node.get("start").isTextual());
+        assertEquals(LocalDate.MIN.toString(), node.get("start").asText());
     }
 
     @Test

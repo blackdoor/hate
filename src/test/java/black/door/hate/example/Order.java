@@ -2,13 +2,15 @@ package black.door.hate.example;
 
 import black.door.hate.HalRepresentation;
 import black.door.hate.HalResource;
+import black.door.hate.JacksonHalResource;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 
 /**
  * Created by nfischer on 12/8/2015.
  */
 @Getter
-public class Order extends Thing{
+public class Order extends Thing implements JacksonHalResource{
 
 	private double total;
 	private String currency;
@@ -28,8 +30,8 @@ public class Order extends Thing{
 
 
 	@Override
-	public HalRepresentation.HalRepresentationBuilder representationBuilder() {
-		return Order.super.representationBuilder()
+	public HalRepresentation.HalRepresentationBuilder representationBuilder(ObjectMapper mapper) {
+		return JacksonHalResource.super.representationBuilder(mapper)
 				.removeProperty("basket")
 				.removeProperty("id")
 				.removeProperty("customer")

@@ -1,5 +1,6 @@
 # hate
-HATEOAS with HAL for Java. Create hypermedia APIs by easily serializing your Java models into [HAL](http://stateless.co/hal_specification.html) JSON.
+HATEOAS with HAL for Java. Create hypermedia APIs by easily serializing your Java models into [HAL](http://stateless.co/hal_specification.html) JSON.  
+More info in the [wiki](https://github.com/blackdoor/hate/wiki).
 
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/blackdoor/hate)  
 [![Build Status](https://travis-ci.org/blackdoor/hate.svg)](https://travis-ci.org/blackdoor/hate)  

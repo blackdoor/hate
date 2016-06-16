@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -36,7 +37,9 @@ public class HalRepresentation implements java.io.Serializable {
 	private static ObjectWriter WRITER;
 	static {
 		MAPPER = new ObjectMapper()
-				.registerModule(new JavaTimeModule());
+				.findAndRegisterModules()
+				.registerModule(new JavaTimeModule())
+				.registerModule(new Jdk8Module());
 		WRITER = MAPPER.writer();
 	}
 

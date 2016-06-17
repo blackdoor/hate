@@ -3,6 +3,7 @@ package black.door.hate;
 import com.damnhandy.uri.template.UriTemplate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.*;
 
@@ -21,7 +22,10 @@ import java.util.Optional;
 public class HalLink implements LinkOrResource{
 
 	private @NonNull final String href;
+
+	@Getter(AccessLevel.NONE) @JsonProperty
 	private final Boolean templated;
+
 	private final String type;
 	private final URL deprecation;
 	private final String name;
@@ -60,8 +64,9 @@ public class HalLink implements LinkOrResource{
 		return Optional.empty();
 	}
 
+	@JsonIgnore
 	public boolean isTemplated(){
-		return templated;
+		return templated == null ? false : templated;
 	}
 
 	@Override

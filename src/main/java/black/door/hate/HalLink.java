@@ -4,9 +4,14 @@ import com.damnhandy.uri.template.UriTemplate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import lombok.*;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -18,31 +23,31 @@ import java.util.Optional;
  */
 @Getter
 @EqualsAndHashCode
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonSerialize(using = HalLink.HalLinkSerializer.class)
 public class HalLink implements LinkOrResource{
 
 	private @NonNull final String href;
 
 	@Getter(AccessLevel.NONE) @JsonProperty
 	private final Boolean templated;
-
-	private final String type;
-	private final URL deprecation;
-	private final String name;
-	private final URI profile;
-	private final String title;
-	private final String hreflang;
+	private final Optional<String> type;
+	private final Optional<URL> deprecation;
+	private final Optional<String> name;
+	private final Optional<URI> profile;
+	private final Optional<String> title;
+	private final Optional<String> hreflang;
 
 	@java.beans.ConstructorProperties({"href", "templated", "type", "deprecation", "name", "profile", "title", "hreflang"})
 	HalLink(String href, Boolean templated, String type, URL deprecation, String name, URI profile, String title, String hreflang) {
 		this.href = href;
 		this.templated = templated;
-		this.type = type;
-		this.deprecation = deprecation;
-		this.name = name;
-		this.profile = profile;
-		this.title = title;
-		this.hreflang = hreflang;
+		this.type = Optional.ofNullable(type);
+		this.deprecation = Optional.ofNullable(deprecation);
+		this.name = Optional.ofNullable(name);
+		this.profile = Optional.ofNullable(profile);
+		this.title = Optional.ofNullable(title);
+		this.hreflang = Optional.ofNullable(hreflang);
 	}
 
 	public static HalLinkBuilder builder() {
@@ -142,5 +147,39 @@ public class HalLink implements LinkOrResource{
 			return new HalLink(href, templated, type, deprecation, name, profile, title, hreflang);
 		}
 
+	}
+
+	public static class HalLinkSerializer extends StdSerializer<HalLink> {
+
+		protected HalLinkSerializer() {
+			this(HalLink.class);
+		}
+
+		protected HalLinkSerializer(Class<HalLink> clazz) {
+			super(clazz);
+		}
+
+		@Override
+		public void serialize(HalLink value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+			gen.writeStartObject();
+
+			provider.defaultSerializeField("href", value.href, gen);
+			if(value.templated != null)
+				provider.defaultSerializeField("templated", value.templated, gen);
+			if(value.type.isPresent())
+				provider.defaultSerializeField("type", value.type, gen);
+			if(value.deprecation.isPresent())
+				provider.defaultSerializeField("deprecation", value.deprecation, gen);
+			if(value.name.isPresent())
+				provider.defaultSerializeField("name", value.name, gen);
+			if(value.profile.isPresent())
+				provider.defaultSerializeField("profile", value.profile, gen);
+			if(value.title.isPresent())
+				provider.defaultSerializeField("title", value.title, gen);
+			if(value.hreflang.isPresent())
+				provider.defaultSerializeField("hreflang", value.hreflang, gen);
+
+			gen.writeEndObject();
+		}
 	}
 }

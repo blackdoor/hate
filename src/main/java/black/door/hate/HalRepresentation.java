@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 import static black.door.hate.Constants.*;
 import static black.door.util.Misc.require;
 import static java.util.Map.Entry;
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
@@ -55,17 +56,12 @@ public class HalRepresentation implements java.io.Serializable {
 			Map<String, HalResource> embedded,
 			Map<String, List<HalResource>> multiEmbedded,
 			Map<String, Object> properties) {
-		require(null != links);
-		require(null != multiLinks);
-		require(null != embedded);
-		require(null != multiEmbedded);
-		require(null != properties);
 
-		this.links = links;
-		this.multiLinks = multiLinks;
-		this.embedded = embedded;
-		this.multiEmbedded = multiEmbedded;
-		this.properties = properties;
+		this.links = requireNonNull(links);
+		this.multiLinks = requireNonNull(multiLinks);
+		this.embedded = requireNonNull(embedded);
+		this.multiEmbedded = requireNonNull(multiEmbedded);
+		this.properties = requireNonNull(properties);
 	}
 
 	static ObjectMapper getMapper(){
@@ -130,8 +126,8 @@ public class HalRepresentation implements java.io.Serializable {
 
 		@Override
 		public void serialize(HalRepresentation halRepresentation,
-		                      JsonGenerator jsonGenerator,
-		                      SerializerProvider serializerProvider)
+							  JsonGenerator jsonGenerator,
+							  SerializerProvider serializerProvider)
 				throws IOException{
 			jsonGenerator.writeStartObject();
 
@@ -170,6 +166,7 @@ public class HalRepresentation implements java.io.Serializable {
 									.map(HalResource::asEmbedded)
 									.collect(toList())
 					));
+
 
 			//put all embedded resources and collections of embedded resources into one object
 			Map<String, Object> embedded = new HashMap<>();
@@ -266,7 +263,7 @@ public class HalRepresentation implements java.io.Serializable {
 		 * @param multiRs
 		 */
 		private <T extends LinkOrResource> void add(String name, T res, Map<String, T> rs,
-		                                            Map<String, List<T>> multiRs){
+													Map<String, List<T>> multiRs){
 
 			if(res == null && ignoreNullResources)
 				return;

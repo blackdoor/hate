@@ -19,7 +19,7 @@ public class Order extends Thing implements JacksonHalResource{
 	private Customer customer;
 
 	public Order(long id, double total, String currency, String status,
-	             Basket basket, Customer customer) {
+				 Basket basket, Customer customer) {
 		super(id);
 		this.total = total;
 		this.currency = currency;

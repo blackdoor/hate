@@ -23,7 +23,7 @@
 
     <groupId>black.door</groupId>
     <artifactId>hate</artifactId>
-    <version>v1r4t0</version>
+    <version>v1r4t1</version>
 
     <developers>
         <developer>
@@ -204,7 +204,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jackson.version>2.7.5</jackson.version>
+        <jackson.version>2.9.7</jackson.version>
     </properties>
 
 </project>

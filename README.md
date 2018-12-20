@@ -6,7 +6,7 @@ More info in the [wiki](https://github.com/blackdoor/hate/wiki).
 [![Build Status](https://travis-ci.org/blackdoor/hate.svg)](https://travis-ci.org/blackdoor/hate)  
 [![Codacy Badge](https://api.codacy.com/project/badge/grade/7c1d6531e44941ed9e48b75435c9f1b8)](https://www.codacy.com/app/nfischer921/hate)  
 [![Codecov](https://img.shields.io/codecov/c/github/blackdoor/hate.svg)](https://codecov.io/github/blackdoor/hate)  
-[![JavaDocs](http://javadoc-emblem.rhcloud.com/doc/black.door/hate/badge.svg?color=blue)](https://www.javadoc.io/doc/black.door/hate)  
+[![Javadocs](https://www.javadoc.io/badge/black.door/hate.svg?color=blue)](https://www.javadoc.io/doc/black.door/hate)  
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/black.door/hate/badge.svg)](http://mvnrepository.com/artifact/black.door/hate)
 
 ---
@@ -17,7 +17,7 @@ More info in the [wiki](https://github.com/blackdoor/hate/wiki).
   <dependency>
     <groupId>black.door</groupId>
     <artifactId>hate</artifactId>
-    <version>v1r4t0</version>
+    <version>v1r4t1</version>
   </dependency>
 </dependencies>
 ```

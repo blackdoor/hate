@@ -38,14 +38,14 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.4</version>
+            <version>1.18.6</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>black.door</groupId>
             <artifactId>blackdoor-lib</artifactId>
-            <version>v4r3t0</version>
+            <version>v4r3t1</version>
         </dependency>
 
         <dependency>
@@ -82,7 +82,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20151123</version>
+            <version>20180813</version>
             <scope>test</scope>
         </dependency>
 
@@ -180,7 +180,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.0.1</version>
+                        <version>3.1.0</version>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>

@@ -17,7 +17,7 @@ More info in the [wiki](https://github.com/blackdoor/hate/wiki).
   <dependency>
     <groupId>black.door</groupId>
     <artifactId>hate</artifactId>
-    <version>v1r4t3</version>
+    <version>v1r4t4</version>
   </dependency>
 </dependencies>
 ```

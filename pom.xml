@@ -23,7 +23,7 @@
 
     <groupId>black.door</groupId>
     <artifactId>hate</artifactId>
-    <version>v1r4t3</version>
+    <version>v1r4t4</version>
 
     <developers>
         <developer>
@@ -189,6 +189,9 @@
                                 </goals>
                             </execution>
                         </executions>
+                        <configuration>
+                            <source>8</source>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>

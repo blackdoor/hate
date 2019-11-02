@@ -31,7 +31,7 @@ public class Order extends Thing implements JacksonHalResource{
 
 	@Override
 	public HalRepresentation.HalRepresentationBuilder representationBuilder(ObjectMapper mapper) {
-		return JacksonHalResource.super.representationBuilder(mapper)
+		return super.representationBuilder(mapper)
 				.removeProperty("basket")
 				.removeProperty("id")
 				.removeProperty("customer")
